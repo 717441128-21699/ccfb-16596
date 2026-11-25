@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head><meta charset="utf-8" /><title>smoke</title></head>
+  <body>
+    <canvas id="c" width="640" height="360"></canvas>
+    <pre id="log">booting…</pre>
+    <script type="module">
+      const log = document.getElementById('log');
+      const lines = [];
+      const out = (s) => { lines.push(s); log.textContent = lines.join('\n'); };
+      window.addEventListener('error', (e) => out('PAGE_ERROR: ' + e.message + ' @ ' + (e.filename || '') + ':' + (e.lineno || 0)));
+      window.addEventListener('unhandledrejection', (e) => out('PROMISE_REJECT: ' + (e.reason?.stack || e.reason)));
+      try {
+        if (!('gpu' in navigator)) { out('NO_WEBGPU'); throw new Error('no webgpu'); }
+        const adapter = await navigator.gpu.requestAdapter({ powerPreference: 'high-performance' });
+        out('adapter: ' + (adapter ? JSON.stringify(adapter.info ? { vendor: adapter.info.vendor, architecture: adapter.info.architecture, device: adapter.info.device, description: adapter.info.description } : 'no-info') : 'null'));
+        const device = await adapter.requestDevice();
+        device.addEventListener('uncapturederror', (e) => out('GPU_ERROR: ' + e.error.message));
+        device.addEventListener('devicelost', (e) => out('DEVICE_LOST: ' + e.message));
+
+        const mod = await import('/src/main.ts');
+        out('main.ts imported: ' + Object.keys(mod).length + ' exports');
+
+        // 等主入口初始化
+        await new Promise((r) => setTimeout(r, 2500));
+        const errBox = document.getElementById('gpu-error');
+        if (errBox && !errBox.hidden) {
+          out('GPU_ERROR_PANEL_VISIBLE: ' + errBox.textContent);
+        } else {
+          out('app mounted, no error panel');
+        }
+        out('SMOKE_DONE');
+      } catch (e) {
+        out('FATAL: ' + (e?.stack || e));
+      }
+    </script>
+  </body>
+</html>

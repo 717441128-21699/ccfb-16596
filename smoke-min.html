@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+  <body>
+    <pre id="log">booting…</pre>
+    <script type="module">
+      document.getElementById('log').textContent = 'module-ran';
+      const hasGpu = 'gpu' in navigator;
+      try {
+        if (hasGpu) {
+          const adapter = await navigator.gpu.requestAdapter();
+          document.getElementById('log').textContent = 'module-ran, adapter=' + (adapter ? adapter.info?.vendor || 'ok' : 'null');
+        } else {
+          document.getElementById('log').textContent = 'module-ran, NO_WEBGPU';
+        }
+      } catch (e) {
+        document.getElementById('log').textContent = 'module-ran, gpu-error: ' + e.message;
+      }
+    </script>
+  </body>
+</html>
