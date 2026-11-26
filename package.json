@@ -1,0 +1,27 @@
+{
+  "name": "barrel-wave-previs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "WebGPU 管浪广告镜头预演系统：卷浪几何、海水吸收透光、水帘泡沫水雾",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite-node tests/wgsl-check.ts && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "wgsl": "vite-node tests/wgsl-check.ts",
+    "smoke": "vite-node tests/smoke.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.7",
+    "@webgpu/types": "^0.1.51",
+    "playwright": "^1.65.1",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.5"
+  },
+  "allowScripts": {
+    "esbuild@0.21.5": true
+  }
+}
